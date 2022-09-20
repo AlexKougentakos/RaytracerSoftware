@@ -9,6 +9,7 @@
 #include "Material.h"
 #include "Scene.h"
 #include "Utils.h"
+#include  <iostream>
 
 using namespace dae;
 
@@ -19,6 +20,8 @@ Renderer::Renderer(SDL_Window * pWindow) :
 	//Initialize
 	SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
 	m_pBufferPixels = static_cast<uint32_t*>(m_pBuffer->pixels);
+
+	m_AspectRatio = { float(m_Width) / float(m_Height) };
 }
 
 void Renderer::Render(Scene* pScene) const
@@ -31,11 +34,27 @@ void Renderer::Render(Scene* pScene) const
 	{
 		for (int py{}; py < m_Height; ++py)
 		{
-			float gradient = px / static_cast<float>(m_Width);
+			/*float gradient = px / static_cast<float>(m_Width);
 			gradient += py / static_cast<float>(m_Width);
-			gradient /= 2.0f;
+			gradient /= 2.0f;*/
 
-			ColorRGB finalColor{ gradient, gradient, gradient };
+			//Raster to NDC
+			float NDCx{ (px + 0.5f) / m_Width };
+			float NDCy{ (py + 0.5f) / m_Height };
+
+			//NDC to Screen
+			float ScreenX{ 2 * NDCx - 1 };
+			float ScreenY{  1 - 2 * NDCy};
+
+			//Screen To Cam
+			float CamX { ScreenX * (float(m_Width) / float(m_Height)) };
+			float CamY{ ScreenY };
+
+			Vector3 rayDirection{ CamX, CamY, 1 };
+			rayDirection.Normalize();
+
+			ColorRGB finalColor{ rayDirection.x, rayDirection.y, rayDirection.z };
+			//ColorRGB finalColor{ gradient, gradient, gradient };
 
 			//Update Color in Buffer
 			finalColor.MaxToOne();
