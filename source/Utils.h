@@ -1,6 +1,7 @@
 #pragma once
 #include <cassert>
 #include <fstream>
+#include <iostream>
 #include "Math.h"
 #include "DataTypes.h"
 
@@ -14,13 +15,29 @@ namespace dae
 		{	
 			Vector3 L{ sphere.origin.x - ray.origin.x, sphere.origin.y - ray.origin.y, sphere.origin.z - ray.origin.z };
 			float Tca{ L.Project(L, ray.direction).Magnitude()};
-			float od = sqrtf(L.Reject(L, ray.direction).Magnitude());
+			float od = L.Reject(L, ray.direction).Magnitude();
 			
 			if (od > sphere.radius) return false;
 
 			float Thc{ sqrtf(Square(sphere.radius) - Square(od)) };
 			hitRecord.didHit = true;
-			hitRecord.origin = ray.origin + (Tca - Thc) * ray.direction;
+
+			Vector3 t1{ ((Tca - Thc) * ray.direction.Normalized()) };
+			Vector3 t2{ (Thc + Tca) * ray.direction.Normalized()};
+
+			if (t1.Magnitude() == t2.Magnitude() || t1.Magnitude() < t2.Magnitude())
+			{
+				hitRecord.origin = t1;
+				hitRecord.t = t1.Magnitude();
+			}
+			else if (t1.Magnitude() > t2.Magnitude())
+			{
+				hitRecord.origin = t2;
+				hitRecord.t = t2.Magnitude();
+			}
+
+
+
 			return true;
 
 		}
