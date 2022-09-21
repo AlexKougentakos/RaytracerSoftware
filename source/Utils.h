@@ -11,10 +11,18 @@ namespace dae
 #pragma region Sphere HitTest
 		//SPHERE HIT-TESTS
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
-		{
-			//todo W1
-			assert(false && "No Implemented Yet!");
-			return false;
+		{	
+			Vector3 L{ sphere.origin.x - ray.origin.x, sphere.origin.y - ray.origin.y, sphere.origin.z - ray.origin.z };
+			float Tca{ L.Project(L, ray.direction).Magnitude()};
+			float od = sqrtf(L.Reject(L, ray.direction).Magnitude());
+			
+			if (od > sphere.radius) return false;
+
+			float Thc{ sqrtf(Square(sphere.radius) - Square(od)) };
+			hitRecord.didHit = true;
+			hitRecord.origin = ray.origin + (Tca - Thc) * ray.direction;
+			return true;
+
 		}
 
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)

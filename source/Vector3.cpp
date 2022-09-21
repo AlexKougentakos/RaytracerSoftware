@@ -73,6 +73,11 @@ namespace dae {
 		return v1 - (2.f * Vector3::Dot(v1, v2) * v2);
 	}
 
+	Vector3 Vector3::Lico(float f1, const Vector3& v1, float f2, const Vector3& v2, float f3, const Vector3& v3)
+	{
+		return Vector3();
+	}
+
 	Vector4 Vector3::ToPoint4() const
 	{
 		return { x, y, z, 1 };
@@ -87,6 +92,11 @@ namespace dae {
 	Vector3 Vector3::operator*(float scale) const
 	{
 		return { x * scale, y * scale, z * scale };
+	}
+
+	Vector3 Vector3::operator*(const Vector3& vector) const
+	{
+		return { x * vector.x, y * vector.y, z * vector.z };
 	}
 
 	Vector3 Vector3::operator/(float scale) const

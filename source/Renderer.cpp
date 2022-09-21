@@ -52,9 +52,19 @@ void Renderer::Render(Scene* pScene) const
 
 			Vector3 rayDirection{ CamX, CamY, 1 };
 			rayDirection.Normalize();
+			Ray viewRay{ {0,0,0}, rayDirection };
 
-			ColorRGB finalColor{ rayDirection.x, rayDirection.y, rayDirection.z };
-			//ColorRGB finalColor{ gradient, gradient, gradient };
+			ColorRGB finalColor{ };
+			
+			HitRecord closestHit;
+
+			Sphere testShphere{ {0,0,1000.f}, 25.f, 0 };
+			GeometryUtils::HitTest_Sphere(testShphere, viewRay, closestHit);
+
+			if (closestHit.didHit)
+			{
+				finalColor = materials[closestHit.materialIndex]->Shade();
+			}
 
 			//Update Color in Buffer
 			finalColor.MaxToOne();
