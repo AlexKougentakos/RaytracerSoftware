@@ -57,15 +57,12 @@ void Renderer::Render(Scene* pScene) const
 			ColorRGB finalColor{ };
 			
 			HitRecord closestHit;
-
-			Sphere testShphere{ {0,0,100.f}, 50.f, 0 };
-			GeometryUtils::HitTest_Sphere(testShphere, viewRay, closestHit);
+			
+			pScene->GetClosestHit(viewRay, closestHit);
 
 			if (closestHit.didHit)
 			{
-				const float scaled_t = (closestHit.t - 50.f) / 40.f;
-				//finalColor = materials[closestHit.materialIndex]->Shade();
-				finalColor = { scaled_t, scaled_t, scaled_t };
+				finalColor = materials[closestHit.materialIndex]->Shade();
 			}
 
 			//Update Color in Buffer

@@ -21,6 +21,7 @@ namespace dae
 
 			float Thc{ sqrtf(Square(sphere.radius) - Square(od)) };
 			hitRecord.didHit = true;
+			hitRecord.materialIndex = sphere.materialIndex;
 
 			Vector3 t1{ ((Tca - Thc) * ray.direction.Normalized()) };
 			Vector3 t2{ (Thc + Tca) * ray.direction.Normalized()};
@@ -35,9 +36,6 @@ namespace dae
 				hitRecord.origin = t2;
 				hitRecord.t = t2.Magnitude();
 			}
-
-
-
 			return true;
 
 		}
