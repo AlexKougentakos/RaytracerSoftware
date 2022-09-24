@@ -44,10 +44,10 @@ void Renderer::Render(Scene* pScene) const
 
 			//NDC to Screen
 			float ScreenX{ 2 * NDCx - 1 };
-			float ScreenY{  1 - 2 * NDCy};
+			float ScreenY{ 1 - 2 * NDCy };
 
 			//Screen To Cam
-			float CamX { ScreenX * (float(m_Width) / float(m_Height)) };
+			float CamX{ ScreenX * (float(m_Width) / float(m_Height)) };
 			float CamY{ ScreenY };
 
 			Vector3 rayDirection{ CamX, CamY, 1 };
@@ -55,9 +55,9 @@ void Renderer::Render(Scene* pScene) const
 			Ray viewRay{ {0,0,0}, rayDirection };
 
 			ColorRGB finalColor{ };
-			
-			HitRecord closestHit;
-			
+
+			HitRecord closestHit{};
+
 			pScene->GetClosestHit(viewRay, closestHit);
 
 			if (closestHit.didHit)

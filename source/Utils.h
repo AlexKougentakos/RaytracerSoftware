@@ -17,6 +17,7 @@ namespace dae
 			float Tca{ L.Project(L, ray.direction).Magnitude()};
 			float od = L.Reject(L, ray.direction).Magnitude();
 			
+			hitRecord.didHit = false;
 			if (od > sphere.radius) return false;
 
 			float Thc{ sqrtf(Square(sphere.radius) - Square(od)) };
@@ -50,9 +51,22 @@ namespace dae
 		//PLANE HIT-TESTS
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			//todo W1
-			assert(false && "No Implemented Yet!");
-			return false;
+			//if (Vector3::Dot(plane.normal, ray.direction) == 0) return false;
+			
+			float t = ( Vector3::Dot((plane.origin - ray.origin), plane.normal) / Vector3::Dot(ray.direction, plane.normal));
+
+			if (t >= ray.min && t <= ray.max)
+			{
+				Vector3 interPoint{ ray.origin.x + ray.direction.x * t, ray.origin.y + ray.direction.y * t, ray.origin.z + ray.direction.z * t};
+
+				hitRecord.didHit = true;
+				hitRecord.origin = interPoint;
+				hitRecord.materialIndex = plane.materialIndex;
+				hitRecord.t = t;
+
+				return hitRecord.didHit;
+			}
+
 		}
 
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray)
