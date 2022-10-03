@@ -2,6 +2,7 @@
 #include <cassert>
 #include <SDL_keyboard.h>
 #include <SDL_mouse.h>
+#include <iostream>
 
 #include "Math.h"
 #include "Timer.h"
@@ -23,20 +24,31 @@ namespace dae
 		float fovAngle{90.f};
 
 		Vector3 forward{Vector3::UnitZ};
+		//Vector3 forward{ 0.266f, -0.453f, 0.860f }; //test the camera rotation
 		Vector3 up{Vector3::UnitY};
 		Vector3 right{Vector3::UnitX};
 
-		float totalPitch{0.f};
-		float totalYaw{0.f};
+		float totalPitch{0.f}; //c
+		float totalYaw{0.f};  //a
 
 		Matrix cameraToWorld{};
 
 
 		Matrix CalculateCameraToWorld()
 		{
-			//todo: W2
-			assert(false && "Not Implemented Yet");
-			return {};
+			Matrix ONB{};
+			right = { Vector3::Cross(Vector3::UnitY, forward).Normalized() };
+			up = { Vector3::Cross(forward, right).Normalized() };
+
+			ONB =
+			{
+				{right.x, right.y, right.z, 0},
+				{up.x, up.y, up.z, 0},
+				{forward.x, forward.y, forward.z, 0},
+				{origin.x,origin.y,origin.z, 1}
+			};
+			
+			return ONB;
 		}
 
 		void Update(Timer* pTimer)
@@ -46,13 +58,50 @@ namespace dae
 			//Keyboard Input
 			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
 
+			if (pKeyboardState[SDL_SCANCODE_UP])
+			{
+				origin += forward * deltaTime * 5;
+			}
+			if (pKeyboardState[SDL_SCANCODE_DOWN])
+			{
+				origin -= forward * deltaTime * 5;
+			}
+			if (pKeyboardState[SDL_SCANCODE_RIGHT])
+			{
+				origin += right * deltaTime * 5;
+			}
+			if (pKeyboardState[SDL_SCANCODE_LEFT])
+			{
+				origin -= right * deltaTime * 5;
+			}
+
+			static SDL_bool lockMouse{ SDL_FALSE };
+
+			if (pKeyboardState[SDL_SCANCODE_M])
+				switch (int(lockMouse))
+				{
+				case 0:
+					lockMouse = SDL_TRUE;
+					break;
+				case 1:
+					lockMouse = SDL_FALSE;
+					break;
+				}
+
+
+
 
 			//Mouse Input
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
+			SDL_SetRelativeMouseMode(lockMouse);
 
-			//todo: W2
-			//assert(false && "Not Implemented Yet");
+			totalPitch -= mouseY * deltaTime;
+			totalYaw += mouseX * deltaTime;
+
+			const Matrix rotation{ Matrix::CreateRotation( totalPitch, totalYaw, 0) };
+			forward = rotation.TransformVector(Vector3::UnitZ);
+			forward.Normalize();
 		}
 	};
 }

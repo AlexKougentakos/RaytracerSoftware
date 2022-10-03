@@ -30,6 +30,7 @@ void Renderer::Render(Scene* pScene) const
 	auto& materials = pScene->GetMaterials();
 	auto& lights = pScene->GetLights();
 
+	static const float FOV{ tanf(TO_RADIANS * (camera.fovAngle / 2)) };
 	for (int px{}; px < m_Width; ++px)
 	{
 		for (int py{}; py < m_Height; ++py)
@@ -39,20 +40,23 @@ void Renderer::Render(Scene* pScene) const
 			gradient /= 2.0f;*/
 
 			//Raster to NDC
-			float NDCx{ (px + 0.5f) / m_Width };
-			float NDCy{ (py + 0.5f) / m_Height };
+			const float NDCx{ (px + 0.5f) / m_Width };
+			const float NDCy{ (py + 0.5f) / m_Height };
 
 			//NDC to Screen
-			float ScreenX{ 2 * NDCx - 1 };
-			float ScreenY{ 1 - 2 * NDCy };
+			const float ScreenX{ 2 * NDCx - 1 };
+			const float ScreenY{ 1 - 2 * NDCy };
 
 			//Screen To Cam
-			float CamX{ ScreenX * (float(m_Width) / float(m_Height)) };
-			float CamY{ ScreenY };
+			const float CamX{ ScreenX * (float(m_Width) / float(m_Height)) * FOV };
+			const float CamY{ ScreenY * FOV };
 
 			Vector3 rayDirection{ CamX, CamY, 1 };
-			rayDirection.Normalize();
-			Ray viewRay{ {0,0,0}, rayDirection };
+			const Matrix cameraToWorld{ camera.CalculateCameraToWorld() };
+
+			rayDirection = cameraToWorld.TransformVector(rayDirection);
+
+			Ray viewRay{ camera.origin, rayDirection };
 
 			ColorRGB finalColor{ };
 

@@ -13,32 +13,34 @@ namespace dae
 		//SPHERE HIT-TESTS
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{	
-			Vector3 L{ sphere.origin.x - ray.origin.x, sphere.origin.y - ray.origin.y, sphere.origin.z - ray.origin.z };
-			float Tca{ L.Project(L, ray.direction).Magnitude()};
-			float od = L.Reject(L, ray.direction).Magnitude();
+			const Vector3 Length{ (sphere.origin - ray.origin) };
+			const float Tca{ Vector3::Dot(Length, ray.direction.Normalized()) };
+
+
+			const float ODsq{ Square(Vector3::Reject(Length, ray.direction.Normalized()).Magnitude()) };
+			if (ODsq > Square(sphere.radius)) return false;
+
+			const float Thc{ std::sqrtf(Square( sphere.radius ) - ODsq) };
+
+			const float t1{ Tca - Thc };
+			const float t2{ Tca + Thc };
+
+			if (t1 <= 0 && t2 <= 0) return false;
+			const float t = t1 < t2 ? t1 : t2;
 			
-			hitRecord.didHit = false;
-			if (od > sphere.radius) return false;
-
-			float Thc{ sqrtf(Square(sphere.radius) - Square(od)) };
-			hitRecord.didHit = true;
-			hitRecord.materialIndex = sphere.materialIndex;
-
-			Vector3 t1{ ((Tca - Thc) * ray.direction.Normalized()) };
-			Vector3 t2{ (Thc + Tca) * ray.direction.Normalized()};
-
-			if (t1.Magnitude() == t2.Magnitude() || t1.Magnitude() < t2.Magnitude())
+			if (t >= ray.min && t <= ray.max)
 			{
-				hitRecord.origin = t1;
-				hitRecord.t = t1.Magnitude();
+				hitRecord.didHit = true;
+				hitRecord.materialIndex = sphere.materialIndex;
+				hitRecord.normal = (ray.origin + t * ray.direction.Normalized()) - sphere.origin;
+				hitRecord.normal.Normalize();
+				hitRecord.origin = { ray.origin + t * ray.direction };
+				hitRecord.t = t;
 			}
-			else if (t1.Magnitude() > t2.Magnitude())
-			{
-				hitRecord.origin = t2;
-				hitRecord.t = t2.Magnitude();
-			}
-			return true;
+			else
+				hitRecord.didHit = false;
 
+			return hitRecord.didHit;
 		}
 
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)
