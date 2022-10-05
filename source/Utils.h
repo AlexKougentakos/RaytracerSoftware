@@ -20,7 +20,8 @@ namespace dae
 			const float ODsq{ Square(Vector3::Reject(Length, ray.direction.Normalized()).Magnitude()) };
 			if (ODsq > Square(sphere.radius)) return false;
 
-			const float Thc{ std::sqrtf(Square( sphere.radius ) - ODsq) };
+			//const float Thc{ std::sqrtf(Square( sphere.radius ) - ODsq) };
+			const float Thc{ SquareRootImp(Square( sphere.radius ) - ODsq) };
 
 			const float t1{ Tca - Thc };
 			const float t2{ Tca + Thc };
@@ -113,9 +114,10 @@ namespace dae
 		//Direction from target to light
 		inline Vector3 GetDirectionToLight(const Light& light, const Vector3 origin)
 		{
-			//todo W3
-			assert(false && "No Implemented Yet!");
-			return {};
+			Vector3 vector{ light.origin - origin };
+			//vector.Normalize();
+			
+			return vector;
 		}
 
 		inline ColorRGB GetRadiance(const Light& light, const Vector3& target)
