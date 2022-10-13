@@ -77,7 +77,7 @@ void Renderer::Render(Scene* pScene) const
 						finalColor += LightUtils::GetRadiance(lights[i], closestHit.origin) * materials[closestHit.materialIndex]->Shade() * normalLightAngle;
 					}
 
-					if (pScene->DoesHit(lightRay))
+					if (!pScene->DoesHit(lightRay))
 					{
 						finalColor *= 0.5f;
 					}
