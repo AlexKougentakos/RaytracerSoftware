@@ -53,11 +53,11 @@ namespace dae {
 			
 		}
 
-		//for (int i = 0; i < m_PlaneGeometries.size(); i++)
-		//{
-		//	if (GeometryUtils::HitTest_Plane(m_PlaneGeometries[i], ray))
-		//	return true;
-		//}
+		for (int i = 0; i < m_PlaneGeometries.size(); i++)
+		{
+			if (GeometryUtils::HitTest_Plane(m_PlaneGeometries[i], ray))
+			return true;
+		}
 		return false;
 	}
 
@@ -181,6 +181,30 @@ namespace dae {
 
 		//Lights
 		AddPointLight({ 0.f, 5.f, -5.f }, 70.f, colors::White);
+	}
+#pragma endregion
+
+#pragma region SCENE W3
+	void Scene_W3_TestScene::Initialize()
+	{
+		m_Camera.origin = { 0.f, 1.f, -5.f };
+		m_Camera.fovAngle = 45.f;
+
+		//default: Material id0 >> SolidColor Material (RED)
+		const unsigned char matLambert_Red = AddMaterial(new Material_Lambert{ colors::Red, 1.f });
+		const unsigned char matLambert_Blue = AddMaterial(new Material_Lambert{ colors::Blue, 1.f });
+		const unsigned char matLambert_Yellow = AddMaterial(new Material_Lambert{ colors::Yellow, 1.f });
+
+		//Spheres
+		AddSphere({ -0.75f, 1.f, 0.f }, 1.f, matLambert_Red);
+		AddSphere({ 0.75f, 1.f, 0.f }, 1.f, matLambert_Blue);
+
+		//Planes
+		AddPlane({ 0.f, 0.f, 0.f }, { 0.f, 1.f,0.f }, matLambert_Yellow);
+
+		//Lights
+		AddPointLight({ 0.f, 5.f, 5.f }, 25.f, colors::White);
+		AddPointLight({ 0.f, 2.5f, -5.f }, 25.f, colors::White);
 	}
 #pragma endregion
 }

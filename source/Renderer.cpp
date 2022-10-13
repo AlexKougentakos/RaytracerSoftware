@@ -35,10 +35,6 @@ void Renderer::Render(Scene* pScene) const
 	{
 		for (int py{}; py < m_Height; ++py)
 		{
-			/*float gradient = px / static_cast<float>(m_Width);
-			gradient += py / static_cast<float>(m_Width);
-			gradient /= 2.0f;*/
-
 			//Raster to NDC
 			const float NDCx{ (px + 0.5f) / m_Width };
 			const float NDCy{ (py + 0.5f) / m_Height };
@@ -61,24 +57,43 @@ void Renderer::Render(Scene* pScene) const
 			ColorRGB finalColor{ };
 
 			HitRecord closestHit{};
-
 			
 			pScene->GetClosestHit(viewRay, closestHit);
 
 			if (closestHit.didHit)
 			{
-				finalColor = materials[closestHit.materialIndex]->Shade();
-
-				for (int i{ 0 }; i < lights.size(); ++i)
+				for (int i = 0; i < lights.size(); i++)
 				{
 					Vector3 lightDir = LightUtils::GetDirectionToLight(lights[i], closestHit.origin + (closestHit.normal * 0.001f));
+					Ray lightRay{ closestHit.origin + (closestHit.normal * 0.05f),lightDir };
 					const float lightrayMagnitude{ lightDir.Normalize() };
-					Ray lightRay{ closestHit.origin + (closestHit.normal * 0.001f),lightDir };
 					lightRay.max = lightrayMagnitude;
+
+
+					float normalLightAngle{ Vector3::Dot(closestHit.normal, LightUtils::GetDirectionToLight(lights[i], closestHit.origin + (closestHit.normal * 0.05f)).Normalized()) };
+					if (normalLightAngle >= 0)
+					{
+						//Radiance * BRDF * ObservedArea
+						finalColor += LightUtils::GetRadiance(lights[i], closestHit.origin) * materials[closestHit.materialIndex]->Shade() * normalLightAngle;
+					}
+
 					if (pScene->DoesHit(lightRay))
 					{
 						finalColor *= 0.5f;
 					}
+
+					//Hard Shadows Code
+					//for (int i{ 0 }; i < lights.size(); ++i)
+					//{
+					//	Vector3 lightDir = LightUtils::GetDirectionToLight(lights[i], closestHit.origin + (closestHit.normal * 0.001f));
+					//	Ray lightRay{ closestHit.origin + (closestHit.normal * 0.05f),lightDir };
+					//	const float lightrayMagnitude{ lightDir.Normalize() };
+					//	lightRay.max = lightrayMagnitude;
+					//	if (pScene->DoesHit(lightRay))
+					//	{
+					//		finalColor *= 0.5f;
+					//	}
+					//}
 				}
 			}
 
