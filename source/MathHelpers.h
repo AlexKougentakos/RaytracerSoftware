@@ -29,15 +29,14 @@ namespace dae
 	}
 
 	inline float SquareRootImp(const float x)
-	{
-		union
-		{
-			int i;
-			float x;
-		} u;
+	{	
+		unsigned int i = *(unsigned int*)&x;
 
-		u.x = x;
-		u.i = (1 << 29) + (u.i >> 1) - (1 << 22);
-		return u.x;
+		// adjust bias
+		i += 127 << 23;
+		// approximation of square root
+		i >>= 1;
+
+		return *(float*)&i;
 	}
 }

@@ -64,36 +64,21 @@ void Renderer::Render(Scene* pScene) const
 			{
 				for (int i = 0; i < lights.size(); i++)
 				{
-					Vector3 lightDir = LightUtils::GetDirectionToLight(lights[i], closestHit.origin + (closestHit.normal * 0.001f));
+					Vector3 lightDir = LightUtils::GetDirectionToLight(lights[i], closestHit.origin + (closestHit.normal * 0.05f));
 					Ray lightRay{ closestHit.origin + (closestHit.normal * 0.05f),lightDir };
 					const float lightrayMagnitude{ lightDir.Normalize() };
 					lightRay.max = lightrayMagnitude;
 
-
 					float normalLightAngle{ Vector3::Dot(closestHit.normal, LightUtils::GetDirectionToLight(lights[i], closestHit.origin + (closestHit.normal * 0.05f)).Normalized()) };
-					if (normalLightAngle >= 0)
-					{
-						//Radiance * BRDF * ObservedArea
-						finalColor += LightUtils::GetRadiance(lights[i], closestHit.origin) * materials[closestHit.materialIndex]->Shade() * normalLightAngle;
-					}
-
-					if (!pScene->DoesHit(lightRay))
+					if (normalLightAngle < 0)
+						continue;
+					if (pScene->DoesHit(lightRay))
 					{
 						finalColor *= 0.5f;
+						continue;
 					}
-
-					//Hard Shadows Code
-					//for (int i{ 0 }; i < lights.size(); ++i)
-					//{
-					//	Vector3 lightDir = LightUtils::GetDirectionToLight(lights[i], closestHit.origin + (closestHit.normal * 0.001f));
-					//	Ray lightRay{ closestHit.origin + (closestHit.normal * 0.05f),lightDir };
-					//	const float lightrayMagnitude{ lightDir.Normalize() };
-					//	lightRay.max = lightrayMagnitude;
-					//	if (pScene->DoesHit(lightRay))
-					//	{
-					//		finalColor *= 0.5f;
-					//	}
-					//}
+					//Radiance * BRDF * ObservedArea
+					finalColor += LightUtils::GetRadiance(lights[i], closestHit.origin) * materials[closestHit.materialIndex]->Shade(closestHit, lightDir, -viewRay.direction) * normalLightAngle;
 				}
 			}
 
