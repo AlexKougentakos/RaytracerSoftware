@@ -120,7 +120,7 @@ namespace dae
 		//Direction from target to light
 		inline Vector3 GetDirectionToLight(const Light& light, const Vector3 origin)
 		{
-			Vector3 vector{ light.origin - origin };
+			const Vector3 vector{ light.origin - origin };
 			
 			return vector;
 		}

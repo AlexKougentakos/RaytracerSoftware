@@ -20,6 +20,7 @@ namespace dae
 		Vector3 Normalized() const;
 
 		static float Dot(const Vector3& v1, const Vector3& v2);
+		static float DotMax(const Vector3& v1, const Vector3& v2, float maxValue = 0.f);
 		static Vector3 Cross(const Vector3& v1, const Vector3& v2);
 		static Vector3 Project(const Vector3& v1, const Vector3& v2);
 		static Vector3 Reject(const Vector3& v1, const Vector3& v2);

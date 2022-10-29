@@ -29,6 +29,18 @@ namespace dae
 		SDL_Surface* m_pBuffer{};
 		uint32_t* m_pBufferPixels{};
 
+		enum class LightType
+		{
+			ObservedArea,
+			Radiance,
+			BRDF,
+			Combined
+		};
+
+		LightType m_CurrentLight{ LightType::Combined };
+
+		bool m_ShadowsEnabled{ true };
+
 		int m_Width{};
 		int m_Height{};
 		float m_AspectRatio{};
