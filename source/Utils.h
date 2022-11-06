@@ -1,7 +1,6 @@
 #pragma once
 #include <cassert>
 #include <fstream>
-#include <iostream>
 #include "Math.h"
 #include "DataTypes.h"
 

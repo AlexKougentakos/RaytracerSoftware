@@ -82,8 +82,8 @@ namespace dae
 
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
-			return BRDF::Lambert(m_DiffuseReflectance, m_DiffuseColor) +
-				BRDF::Phong(m_SpecularReflectance, m_PhongExponent, l, -v, hitRecord.normal);
+			return BRDF::Lambert(m_DiffuseReflectance, m_DiffuseColor) + 
+				BRDF::Phong(m_SpecularReflectance, m_PhongExponent, l, v, hitRecord.normal);
 		}
 
 	private:
@@ -123,7 +123,12 @@ namespace dae
 			const float denominator{ 4 * Vector3::DotMax(-v, hitRecord.normal) * Vector3::DotMax(l, hitRecord.normal) };
 			const ColorRGB specular{ DFG / std::max(denominator, 0.0001f) };
 
-			const ColorRGB kd = (m_Metalness <= FLT_EPSILON) ? ColorRGB{ 1,1,1 } - fresnel : ColorRGB{ 0, 0, 0 };
+			ColorRGB kd = {};
+			if (AreEqual(m_Metalness, 0))
+				kd = ColorRGB{ 1,1,1 } - fresnel;
+			else
+				kd = { 0,0,0 };
+
 			ColorRGB diffuse { BRDF::Lambert(kd, m_Albedo)};
 			return {diffuse + specular};
 

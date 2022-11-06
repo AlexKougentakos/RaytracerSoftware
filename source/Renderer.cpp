@@ -77,9 +77,9 @@ void Renderer::Render(Scene* pScene) const
 						}
 					}
 
-					switch (m_CurrentLight)
+					switch (m_CurrentLightMode)
 					{
-					case LightType::ObservedArea:
+					case LightingMode::ObservedArea:
 					{
 						const float observedArea = Vector3::DotMax(lightDir, closestHit.normal);
 						if (observedArea > 0)
@@ -88,19 +88,17 @@ void Renderer::Render(Scene* pScene) const
 						}
 					}
 					break;
-					case LightType::Radiance:
+					case LightingMode::Radiance:
 						finalColor += LightUtils::GetRadiance(lights[i], closestHit.origin);
 						break;
-					case LightType::BRDF:
+					case LightingMode::BRDF:
 						finalColor += materials[closestHit.materialIndex]->Shade(closestHit, lightDir, viewRay.direction);
 						break;
-					case LightType::Combined:
+					case LightingMode::Combined:
 					{
-						float observedArea = Vector3::DotMax(lightDir, closestHit.normal);
+						const float observedArea = Vector3::DotMax(lightDir, closestHit.normal);
 						if (observedArea > 0)
-						{
-							finalColor += LightUtils::GetRadiance(lights[i], closestHit.origin) * observedArea * materials[closestHit.materialIndex]->Shade(closestHit, lightDir, viewRay.direction);
-						}
+							finalColor += LightUtils::GetRadiance(lights[i], closestHit.origin) * materials[closestHit.materialIndex]->Shade(closestHit, lightDir, viewRay.direction);
 
 					}
 					break;
@@ -127,3 +125,29 @@ bool Renderer::SaveBufferToImage() const
 {
 	return SDL_SaveBMP(m_pBuffer, "RayTracing_Buffer.bmp");
 }
+
+
+void Renderer::ToggleLightMode()
+{
+	switch (m_CurrentLightMode)
+	{
+	case LightingMode::ObservedArea:
+		m_CurrentLightMode = LightingMode::Radiance;
+		break;
+	case LightingMode::Radiance:
+		m_CurrentLightMode = LightingMode::BRDF;
+		break;
+	case LightingMode::BRDF:
+		m_CurrentLightMode = LightingMode::Combined;
+		break;
+	case LightingMode::Combined:
+		m_CurrentLightMode = LightingMode::ObservedArea;
+		break;
+	}
+}
+
+void Renderer::ToggleShadows()
+{
+	m_ShadowsEnabled = !m_ShadowsEnabled;
+}
+

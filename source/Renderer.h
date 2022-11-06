@@ -22,6 +22,8 @@ namespace dae
 
 		void Render(Scene* pScene) const;
 		bool SaveBufferToImage() const;
+		void ToggleShadows();
+		void ToggleLightMode();
 
 	private:
 		SDL_Window* m_pWindow{};
@@ -29,17 +31,17 @@ namespace dae
 		SDL_Surface* m_pBuffer{};
 		uint32_t* m_pBufferPixels{};
 
-		enum class LightType
+		enum class LightingMode
 		{
-			ObservedArea,
-			Radiance,
-			BRDF,
-			Combined
+			ObservedArea, //Lambert Cosine
+			Radiance, //Incident Radiance
+			BRDF, //Scattering of light
+			Combined, //ObservedArea * Radiance * BRDF
 		};
 
-		LightType m_CurrentLight{ LightType::Combined };
+		LightingMode m_CurrentLightMode{ LightingMode::Combined };
 
-		bool m_ShadowsEnabled{ true };
+		bool m_ShadowsEnabled{ false };
 
 		int m_Width{};
 		int m_Height{};
