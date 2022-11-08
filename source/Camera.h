@@ -75,29 +75,18 @@ namespace dae
 				origin -= right * deltaTime * 5;
 			}
 
-			static SDL_bool lockMouse{ SDL_FALSE };
-
-			if (pKeyboardState[SDL_SCANCODE_M])
-				switch (int(lockMouse))
-				{
-				case 0:
-					lockMouse = SDL_TRUE;
-					break;
-				case 1:
-					lockMouse = SDL_FALSE;
-					break;
-				}
-
-
-
 
 			//Mouse Input
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
-			SDL_SetRelativeMouseMode(lockMouse);
 
-			totalPitch -= mouseY * deltaTime;
-			totalYaw += mouseX * deltaTime;
+			if (mouseState == SDL_BUTTON_RMASK)
+			{
+				SDL_SetRelativeMouseMode(SDL_TRUE);
+				totalPitch -= mouseY * deltaTime;
+				totalYaw += mouseX * deltaTime;
+			}
+			else SDL_SetRelativeMouseMode(SDL_FALSE);
 
 			const Matrix rotation{ Matrix::CreateRotation( totalPitch, totalYaw, 0) };
 			forward = rotation.TransformVector(Vector3::UnitZ);

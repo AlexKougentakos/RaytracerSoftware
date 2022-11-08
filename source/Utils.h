@@ -20,7 +20,7 @@ namespace dae
 			if (od2 > Square(sphere.radius))
 				return false;
 
-			float Thc = SquareRootImp(Square(sphere.radius) - od2);
+			float Thc = std::sqrtf(Square(sphere.radius) - od2);
 			//float Thc = std::sqrtf(Square(sphere.radius) - od2);
 			float t0 = Tca - Thc;
 			float t1 = Tca + Thc;
@@ -70,11 +70,9 @@ namespace dae
 				hitRecord.materialIndex = plane.materialIndex;
 				hitRecord.normal = plane.normal.Normalized();
 				hitRecord.t = t;
-
 			}
 
 			return hitRecord.didHit;
-
 		}
 
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray)
@@ -132,7 +130,6 @@ namespace dae
 			float irradiance{ light.intensity / Square((light.origin - target).Magnitude()) };
 			ColorRGB radiance{ light.color.r * irradiance, light.color.g * irradiance, light.color.b * irradiance };
 			return radiance;
-
 		}
 	}
 

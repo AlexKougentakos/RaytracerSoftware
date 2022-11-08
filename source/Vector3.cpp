@@ -21,7 +21,7 @@ namespace dae {
 	float Vector3::Magnitude() const
 	{
 		//return sqrt(x * x + y * y + z * z);
-		return SquareRootImp(x * x + y * y + z * z);
+		return std::sqrtf(x * x + y * y + z * z);
 	}
 
 	float Vector3::SqrMagnitude() const
@@ -53,10 +53,9 @@ namespace dae {
 		return {result};
 	}
 
-	float Vector3::DotMax(const Vector3& v1, const Vector3& v2, float maxValue)
+	float Vector3::DotMin(const Vector3& v1, const Vector3& v2, float minValue)
 	{
-		return (Dot(v1, v2) > maxValue) ? Dot(v1, v2) : maxValue;
-
+		return (Dot(v1, v2) > minValue) ? Dot(v1, v2) : minValue;
 	}
 
 	Vector3 Vector3::Cross(const Vector3& v1, const Vector3& v2)

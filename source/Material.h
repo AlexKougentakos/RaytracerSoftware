@@ -83,7 +83,7 @@ namespace dae
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
 			return BRDF::Lambert(m_DiffuseReflectance, m_DiffuseColor) + 
-				BRDF::Phong(m_SpecularReflectance, m_PhongExponent, l, v, hitRecord.normal);
+				BRDF::Phong(m_SpecularReflectance, m_PhongExponent, l, -v, hitRecord.normal);
 		}
 
 	private:
@@ -102,6 +102,7 @@ namespace dae
 		Material_CookTorrence(const ColorRGB& albedo, float metalness, float roughness):
 			m_Albedo(albedo), m_Metalness(metalness), m_Roughness(roughness)
 		{
+			assert(m_Roughness > 0.f);
 		}
 
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
@@ -120,8 +121,8 @@ namespace dae
 
 			ColorRGB DFG{ fresnel * normal * geometry };
 
-			const float denominator{ 4 * Vector3::DotMax(-v, hitRecord.normal) * Vector3::DotMax(l, hitRecord.normal) };
-			const ColorRGB specular{ DFG / std::max(denominator, 0.0001f) };
+			const float denominator{ 4 * Vector3::Dot(-v, hitRecord.normal) * Vector3::Dot(l, hitRecord.normal) };
+			const ColorRGB specular{ DFG / denominator };
 
 			ColorRGB kd = {};
 			if (AreEqual(m_Metalness, 0))

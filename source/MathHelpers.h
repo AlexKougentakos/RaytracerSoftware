@@ -1,5 +1,6 @@
 #pragma once
 #include <cmath>
+#include <cassert>
 
 namespace dae
 {
@@ -26,17 +27,5 @@ namespace dae
 	inline bool AreEqual(float a, float b, float epsilon = FLT_EPSILON)
 	{
 		return abs(a - b) < epsilon;
-	}
-
-	inline float SquareRootImp(const float x)
-	{	
-		unsigned int i = *(unsigned int*)&x;
-
-		// adjust bias
-		i += 127 << 23;
-		// approximation of square root
-		i >>= 1;
-
-		return *(float*)&i;
 	}
 }

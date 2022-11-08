@@ -48,13 +48,15 @@ void Renderer::Render(Scene* pScene) const
 			const float CamY{ ScreenY * FOV };
 
 			Vector3 rayDirection{ CamX, CamY, 1 };
-			const Matrix cameraToWorld{ camera.CalculateCameraToWorld() };
 
-			rayDirection = cameraToWorld.TransformVector(rayDirection);
+			rayDirection = camera.cameraToWorld.TransformVector(rayDirection);
+			rayDirection.Normalize();
+
+			const Matrix cameraToWorld{ camera.CalculateCameraToWorld() };
 
 			Ray viewRay{ camera.origin, rayDirection };
 
-			ColorRGB finalColor{ };
+			ColorRGB finalColor{};
 
 			HitRecord closestHit{};
 			
@@ -64,15 +66,20 @@ void Renderer::Render(Scene* pScene) const
 			{
 				for (size_t i{ 0 }; i < lights.size(); ++i)
 				{
-					Vector3 lightDir = LightUtils::GetDirectionToLight(lights[i], closestHit.origin + (closestHit.normal * 0.1f));
-					const float lightrayMagnitude{ lightDir.Normalize() };
+					Vector3 lightDir = LightUtils::GetDirectionToLight(lights[i], closestHit.origin + (closestHit.normal * 0.001f));
+					const float lightrayMagnitude{ lightDir.Magnitude() };
+					lightDir.Normalize();
+
+					const float observedArea = Vector3::Dot(closestHit.normal, lightDir);
+					if (observedArea < 0)
+						continue;
+
 					if (m_ShadowsEnabled)
 					{
 						Ray lightRay{ closestHit.origin + (closestHit.normal * 0.1f), lightDir };
 						lightRay.max = lightrayMagnitude;
 						if (pScene->DoesHit(lightRay))
 						{
-							finalColor *= 0.5f;
 							continue;
 						}
 					}
@@ -81,11 +88,7 @@ void Renderer::Render(Scene* pScene) const
 					{
 					case LightingMode::ObservedArea:
 					{
-						const float observedArea = Vector3::DotMax(lightDir, closestHit.normal);
-						if (observedArea > 0)
-						{
 							finalColor += ColorRGB{ 1,1,1 } * observedArea;
-						}
 					}
 					break;
 					case LightingMode::Radiance:
@@ -96,10 +99,7 @@ void Renderer::Render(Scene* pScene) const
 						break;
 					case LightingMode::Combined:
 					{
-						const float observedArea = Vector3::DotMax(lightDir, closestHit.normal);
-						if (observedArea > 0)
-							finalColor += LightUtils::GetRadiance(lights[i], closestHit.origin) * materials[closestHit.materialIndex]->Shade(closestHit, lightDir, viewRay.direction);
-
+							finalColor += LightUtils::GetRadiance(lights[i], closestHit.origin) * observedArea * materials[closestHit.materialIndex]->Shade(closestHit, lightDir, viewRay.direction);
 					}
 					break;
 					}

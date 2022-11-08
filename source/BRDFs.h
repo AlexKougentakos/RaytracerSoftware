@@ -32,11 +32,13 @@ namespace dae
 		 */
 		static ColorRGB Phong(float ks, float exp, const Vector3& l, const Vector3& v, const Vector3& n)
 		{
-			const Vector3 reflection{ l - 2 * (Vector3::Dot(n, l)) * n };
-			const float cosA{ Vector3::DotMax(reflection, v)};
-			const float phongSpecularReflection{ ks * powf(cosA, exp) };
-			const ColorRGB Phong{ phongSpecularReflection , phongSpecularReflection , phongSpecularReflection };
-			return Phong;
+			Vector3 reflect = Vector3::Reflect(l, n);
+			float alfa = Vector3::Dot(reflect, -v);
+			float PSR{};
+			if (alfa >= 0)
+				PSR = ks * (powf(alfa, exp));
+
+			return { PSR,PSR,PSR };
 		}
 
 		/**
@@ -48,7 +50,6 @@ namespace dae
 		 */
 		static ColorRGB FresnelFunction_Schlick(const Vector3& h, const Vector3& v, const ColorRGB& f0)
 		{
-			return {};
 			return {f0.r + (1 - f0.r) * (1 - std::powf( Vector3::Dot(h, v), 5) ),
 			f0.g + (1 - f0.g) * (1 - std::powf(Vector3::Dot(h, v), 5)) ,
 			f0.b + (1 - f0.b) * (1 - std::powf(Vector3::Dot(h, v), 5))};
@@ -63,11 +64,10 @@ namespace dae
 		 */
 		static float NormalDistribution_GGX(const Vector3& n, const Vector3& h, float roughness)
 		{
-			return {};
 			float aSquared{ std::powf(roughness, 4) };
 			float nhDotSquared{ std::powf( Vector3::Dot(n,h), 2)};
 
-			return { aSquared / PI * std::powf(nhDotSquared * (aSquared - 1) + 1, 2)};
+			return { aSquared / (PI * std::powf(nhDotSquared * (aSquared - 1) + 1, 2))};
 		}
 
 
@@ -80,12 +80,11 @@ namespace dae
 		 */
 		static float GeometryFunction_SchlickGGX(const Vector3& n, const Vector3& v, float roughness)
 		{
-			return {};
 			float nvDot{ Vector3::Dot(n, v) };
 			float a{ std::powf(roughness, 2) };
-			float kDirect{ std::powf(a + 1, 2) };
+			float kDirect{ std::powf(a + 1, 2) / 8.f };
 
-			return { nvDot / nvDot * (1 - kDirect) + kDirect };
+			return { nvDot / (nvDot * (1 - kDirect) + kDirect) };
 		}
 
 		/**
@@ -98,7 +97,6 @@ namespace dae
 		 */
 		static float GeometryFunction_Smith(const Vector3& n, const Vector3& v, const Vector3& l, float roughness)
 		{
-			return {};
 			return {GeometryFunction_SchlickGGX(n,v,roughness) * GeometryFunction_SchlickGGX(n,l,roughness)};
 		}
 

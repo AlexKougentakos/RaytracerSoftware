@@ -118,5 +118,4 @@ namespace dae
 
 		void Initialize() override;
 	};
-
 }

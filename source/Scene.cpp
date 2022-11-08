@@ -56,7 +56,7 @@ namespace dae {
 		for (const auto& m_PlaneGeometry : m_PlaneGeometries)
 		{
 			if (GeometryUtils::HitTest_Plane(m_PlaneGeometry, ray))
-			return true;
+				return true;
 		}
 		return false;
 	}
@@ -229,21 +229,23 @@ namespace dae {
 
 		const auto matLambertPgong1 = AddMaterial(new Material_LambertPhong(colors::Blue, 0.5f, 0.5f, 3.f));
 		const auto matLambertPgong2 = AddMaterial(new Material_LambertPhong(colors::Blue, 0.5f, 0.5f, 15.f));
-		const auto matLambertPgong3 = AddMaterial(new Material_LambertPhong(colors::Blue, 0.5f, 0.5f, 30.f));
+		const auto matLambertPgong3 = AddMaterial(new Material_LambertPhong(colors::Blue, 0.5f, 0.5f, 50.f));
 
-		AddSphere(Vector3{ -1.75, 1.f, 0.f }, .75f, matLambertPgong1);
-		AddSphere(Vector3{ 0, 1.f, 0.f }, .75f, matLambertPgong2);
-		AddSphere(Vector3{ 1.75, 1.f, 0.f }, .75f, matLambertPgong3);
+		//Phong Test
+		//AddSphere(Vector3{ -1.75, 1.f, 0.f }, .75f, matLambertPgong1);
+		//AddSphere(Vector3{ 0, 1.f, 0.f }, .75f, matLambertPgong2);
+		//AddPointLight(Vector3{ 0.f, 5.f, -2.f }, 50.f, ColorRGB{ 1.f, 0.61f, .45f });
+		//AddSphere(Vector3{ 1.75, 1.f, 0.f }, .75f, matLambertPgong3);
 
 		//Spheres
-		//AddSphere(Vector3{ -1.75, 1.f, 0.f }, .75f, matCT_GrayRoughMetal);
-		//AddSphere(Vector3{ 0, 1.f, 0.f }, .75f, matCT_GrayMediumMetal);
-		//AddSphere(Vector3{ 1.75, 1.f, 0.f }, .75f, matCT_GraySmoothMetal);
+		AddSphere(Vector3{ -1.75, 1.f, 0.f }, .75f, matCT_GrayRoughMetal);
+		AddSphere(Vector3{ 0, 1.f, 0.f }, .75f, matCT_GrayMediumMetal);
+		AddSphere(Vector3{ 1.75, 1.f, 0.f }, .75f, matCT_GraySmoothMetal);
 		AddSphere(Vector3{ -1.75, 3.f, 0.f }, .75f, matCT_GrayRoughPlastic);
 		AddSphere(Vector3{ 0, 3.f, 0.f }, .75f, matCT_GrayMediumPlastic);
 		AddSphere(Vector3{ 1.75, 3.f, 0.f }, .75f, matCT_GraySmoothPlastic);
 
-		//Light
+		////Light
 		AddPointLight(Vector3{ 0.f, 5.f, 5.f }, 50.f, ColorRGB{ 1.f, 0.61f, .45f });
 		AddPointLight(Vector3{ -2.5f, 5.f, -5.f }, 70.f, ColorRGB{ 1.f, 0.8f, .45f });
 		AddPointLight(Vector3{ 2.5f, 2.5f, -5.f }, 50.f, ColorRGB{ .34f, 0.47f, .68f });
