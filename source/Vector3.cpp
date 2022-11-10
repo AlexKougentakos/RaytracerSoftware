@@ -21,7 +21,7 @@ namespace dae {
 	float Vector3::Magnitude() const
 	{
 		//return sqrt(x * x + y * y + z * z);
-		return std::sqrtf(x * x + y * y + z * z);
+		return SquareRootImp(x * x + y * y + z * z);
 	}
 
 	float Vector3::SqrMagnitude() const

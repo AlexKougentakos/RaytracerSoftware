@@ -123,20 +123,54 @@ namespace dae
 
 		void CalculateNormals()
 		{
-			assert(false && "No Implemented Yet!");
+			//If the number of vertexes is not a multiple of 3 then return
+			if (indices.size() % 3 != 0)
+				return;
+
+			//Clear the normals & find the number of triangles
+			normals.clear();
+
+			const unsigned int numOfTriangles{ unsigned int(indices.size() / 3) };
+
+			//Find the normal of the triangle based on the the plane the two vectors (made from its points) create
+			for (int i{0}; i < numOfTriangles; ++i)
+			{
+				const Vector3 edgeA{ positions[indices[i * 3 + 1]] - positions[indices[i * 3]] };
+				const Vector3 edgeB{ positions[indices[i * 3 + 2]] - positions[indices[i * 3]] };
+
+				normals.emplace_back(Vector3::Cross(edgeA, edgeB).Normalized());
+			}
 		}
 
 		void UpdateTransforms()
 		{
-			assert(false && "No Implemented Yet!");
 			//Calculate Final Transform 
 			//const auto finalTransform = ...
 
+			//Calculate the TRS matrix
+			const Matrix TRS{ translationTransform * rotationTransform * scaleTransform };
+
+			//Make sure the old positions and normals are cleared
+			transformedPositions.clear();
+			transformedNormals.clear();
+
+			//Use memory pool
+			transformedPositions.reserve(positions.size());
+			transformedNormals.reserve(normals.size());
+
 			//Transform Positions (positions > transformedPositions)
 			//...
+			for (Vector3& pos : positions)
+			{
+				transformedPositions.push_back(TRS.TransformPoint(pos));
+			}
 
 			//Transform Normals (normals > transformedNormals)
 			//...
+			for (Vector3& normal : normals)
+			{
+				transformedNormals.push_back(TRS.TransformVector(normal));
+			}
 		}
 	};
 #pragma endregion

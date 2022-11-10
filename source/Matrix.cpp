@@ -116,13 +116,11 @@ namespace dae {
 
 	Matrix Matrix::CreateRotationX(float pitch)
 	{
-		const float toRadians{ pitch * TO_RADIANS };
-
 		Matrix output
 		{
 			{1, 0, 0, 0},
-			{0, cosf(toRadians), -sinf(toRadians), 0},
-			{0, sinf(toRadians), cosf(toRadians), 0},
+			{0, cosf(pitch), sinf(pitch), 0},
+			{0, -sinf(pitch), cosf(pitch), 0},
 			{0, 0, 0, 1}
 		};
 
@@ -132,13 +130,11 @@ namespace dae {
 
 	Matrix Matrix::CreateRotationY(float yaw)
 	{
-		const float toRadians{ yaw * TO_RADIANS };
-
 		Matrix output
 		{
-			{cosf(toRadians), 0, -sinf(toRadians), 0},
+			{cosf(yaw), 0, -sinf(yaw), 0},
 			{0, 1, 0, 0},
-			{sinf(toRadians), 0, cosf(toRadians), 0},
+			{sinf(yaw), 0, cosf(yaw), 0},
 			{0, 0, 0, 1}
 		};
 
@@ -147,12 +143,10 @@ namespace dae {
 
 	Matrix Matrix::CreateRotationZ(float roll)
 	{
-		const float toRadians{ roll * TO_RADIANS };
-
 		Matrix output
 		{
-			{cosf(toRadians), sinf(toRadians), 0, 0},
-			{-sinf(toRadians), cosf(toRadians), 0, 0},
+			{cosf(roll), -sinf(roll), 0, 0},
+			{sinf(roll), cosf(roll), 0, 0},
 			{0, 0, 1, 0},
 			{0, 0, 0, 1}
 		};
@@ -177,9 +171,15 @@ namespace dae {
 
 	Matrix Matrix::CreateScale(float sx, float sy, float sz)
 	{
-		//todo W1
-		assert(false && "Not Implemented Yet");
-		return {};
+		Matrix output
+		{
+			{sx, 0, 0, 0},
+			{0, sy, 0, 0},
+			{0, 0, sz, 0},
+			{0, 0, 0,  1},
+		};
+
+		return output;
 	}
 
 	Matrix Matrix::CreateScale(const Vector3& s)

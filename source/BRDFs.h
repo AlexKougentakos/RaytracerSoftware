@@ -70,7 +70,6 @@ namespace dae
 			return { aSquared / (PI * std::powf(nhDotSquared * (aSquared - 1) + 1, 2))};
 		}
 
-
 		/**
 		 * \brief BRDF Geometry Function >> Schlick GGX (Direct Lighting + UE4 implementation - squared(roughness))
 		 * \param n Normal of the surface

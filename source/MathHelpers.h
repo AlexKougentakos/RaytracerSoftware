@@ -1,4 +1,5 @@
 #pragma once
+#include <xmmintrin.h>
 #include <cmath>
 #include <cassert>
 
@@ -27,5 +28,12 @@ namespace dae
 	inline bool AreEqual(float a, float b, float epsilon = FLT_EPSILON)
 	{
 		return abs(a - b) < epsilon;
+	}
+
+	inline float SquareRootImp(float num)
+	{
+		return _mm_cvtss_f32(
+			_mm_sqrt_ss(_mm_set_ps1(num))
+		);
 	}
 }

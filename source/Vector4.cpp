@@ -14,7 +14,7 @@ namespace dae
 	float Vector4::Magnitude() const
 	{
 		//return sqrtf(x * x + y * y + z * z + w * w);
-		return std::sqrtf(x * x + y * y + z * z + w * w);
+		return SquareRootImp(x * x + y * y + z * z + w * w);
 	}
 
 	float Vector4::SqrMagnitude() const
