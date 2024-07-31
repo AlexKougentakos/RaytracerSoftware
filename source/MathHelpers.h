@@ -2,6 +2,7 @@
 #include <xmmintrin.h>
 #include <cmath>
 #include <cassert>
+#include <cfloat>
 
 namespace dae
 {
@@ -32,7 +33,7 @@ namespace dae
 
 	inline float SquareRootImp(float num)
 	{
-		return _mm_cvtss_f32(
+		return  _mm_cvtss_f32(
 			_mm_sqrt_ss(_mm_set_ps1(num))
 		);
 	}

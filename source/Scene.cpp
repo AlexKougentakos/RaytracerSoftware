@@ -66,6 +66,7 @@ namespace dae {
 
 		for (const auto& triangleGeometry : m_TriangleMeshGeometries)
 		{
+			//This is in order for the shadows to work properly
 			auto modifiedTriangle = triangleGeometry;
 			if (triangleGeometry.cullMode == TriangleCullMode::BackFaceCulling)
 				modifiedTriangle.cullMode = TriangleCullMode::FrontFaceCulling;
@@ -386,10 +387,10 @@ void dae::Scene_W4_ReferenceScene::Initialize()
 	m_pMeshes[2]->Translate({ 1.75f, 4.5f, 0.0f });
 	m_pMeshes[2]->UpdateTransforms();
 
-	/*for (auto& mesh : m_pMeshes)
+	for (auto& mesh : m_pMeshes)
 	{
 		mesh->UpdateAABB();
-	}*/
+	}
 
 	//Light
 	AddPointLight(Vector3{ 0.0f, 5.0f, 5.0f }, 50.f, ColorRGB{ 1.0f, 0.61f, 0.45f }); // Backlight
@@ -402,7 +403,7 @@ void dae::Scene_W4_ReferenceScene::Update(Timer* pTimer)
 {
 	Scene::Update(pTimer);
 
-	const auto yawAngle = (cosf(pTimer->GetTotal()) + 1.f) / 2.f * PI_2;
+	const float yawAngle{ (cosf(pTimer->GetTotal()) + 1.0f) / 2.0f * PI_2 };
 	for (const auto m : m_pMeshes)
 	{
 		m->RotateY(yawAngle);
@@ -411,7 +412,7 @@ void dae::Scene_W4_ReferenceScene::Update(Timer* pTimer)
 
 	for (auto& mesh : m_pMeshes)
 	{
-		//mesh->UpdateAABB();
+		mesh->UpdateAABB();
 		mesh->UpdateTransforms();
 	}
 }
@@ -434,13 +435,12 @@ void dae::Scene_W4_BunnyScene::Initialize()
 
 
 	m_pBunny = AddTriangleMesh(dae::TriangleCullMode::BackFaceCulling, matLambert_White);
-	Utils::ParseOBJ("Resources/lowpoly_bunny.obj", m_pBunny->positions, m_pBunny->normals, m_pBunny->indices);
+	Utils::ParseOBJ("Resources/lowpoly_bunny2.obj", m_pBunny->positions, m_pBunny->normals, m_pBunny->indices);
 
 	m_pBunny->Scale({ 2.f,2.f,2.f });
 
-	//m_pBunny->UpdateAABB();
+	m_pBunny->UpdateAABB();
 	m_pBunny->UpdateTransforms();
-
 
 	//Light
 	AddPointLight(Vector3{ 0.0f, 5.0f, 5.0f }, 50.f, ColorRGB{ 1.0f, 0.61f, 0.45f }); // Backlight
@@ -452,7 +452,7 @@ void dae::Scene_W4_BunnyScene::Update(Timer* pTimer)
 {
 	Scene::Update(pTimer);
 
-	const auto yawAngle = (cosf(pTimer->GetTotal()) + 1.f) / 2.f * PI_2;
+	const float yawAngle{ (cosf(pTimer->GetTotal()) + 1.0f) / 2.0f * PI_2 };
 	m_pBunny->RotateY(yawAngle);
 	m_pBunny->UpdateTransforms();
 }

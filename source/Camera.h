@@ -1,5 +1,4 @@
 #pragma once
-#include <cassert>
 #include <SDL_keyboard.h>
 #include <SDL_mouse.h>
 
@@ -17,7 +16,6 @@ namespace dae
 			fovAngle{ _fovAngle }
 		{
 		}
-
 
 		Vector3 origin{};
 		float fovAngle{ 90.f };
@@ -53,7 +51,6 @@ namespace dae
 				origin
 			};
 
-
 			return cameraToWorld;
 		}
 
@@ -65,41 +62,14 @@ namespace dae
 
 		void Update(Timer* pTimer)
 		{
-			const float fovChangingSpeed{ 25 };
-			const float baseMovementSpeed{ 0.5f };
+			constexpr float baseMovementSpeed{ 0.5f };
 			float movementSpeed{ baseMovementSpeed };
-			const float rotationSpeed{ 1 / 32.f };
+			constexpr float sensitivity{ 1 / 128.f };
 
 			const float deltaTime = pTimer->GetElapsed();
 
 			//Keyboard Input
 			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
-
-#pragma region Shift
-			if (pKeyboardState[SDL_SCANCODE_LSHIFT] || pKeyboardState[SDL_SCANCODE_RSHIFT])
-			{
-				movementSpeed *= 4;
-			}
-#pragma endregion 
-
-#pragma region FovControls
-			/*if (pKeyboardState[SDL_SCANCODE_LEFT])
-			{
-				if (fovAngle > 10)
-				{
-					fovAngle -= fovChangingSpeed * deltaTime;
-				}
-			}
-			else if (pKeyboardState[SDL_SCANCODE_RIGHT])
-			{
-				if (fovAngle < 170)
-				{
-					fovAngle += fovChangingSpeed * deltaTime;
-				}
-			}*/
-#pragma endregion 
-
-#pragma region KeyboardOnly Controls
 			if (pKeyboardState[SDL_SCANCODE_W] || pKeyboardState[SDL_SCANCODE_UP])
 			{
 				origin += forward * movementSpeed;
@@ -116,17 +86,13 @@ namespace dae
 			{
 				origin -= right * movementSpeed;
 			}
-#pragma endregion 
 
 			//Mouse Input
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
 
-#pragma region Mousebased Movement
-			// LMB
 			if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT))
 			{
-				// RMB
 				if (mouseState & SDL_BUTTON(SDL_BUTTON_RIGHT))
 				{
 					origin += right * (-mouseY * movementSpeed * deltaTime);
@@ -136,16 +102,12 @@ namespace dae
 					origin += forward * (-mouseY * movementSpeed * deltaTime);
 				}
 			}
-#pragma endregion
 
-#pragma region Rotation
 			if (mouseState & SDL_BUTTON_RMASK )
 			{
-				forward = Matrix::CreateRotationY(mouseX * rotationSpeed).TransformVector(forward);
-				forward = Matrix::CreateRotationX(-mouseY * rotationSpeed).TransformVector(forward);
+				forward = Matrix::CreateRotationY(mouseX * sensitivity).TransformVector(forward);
+				forward = Matrix::CreateRotationX(mouseY * sensitivity).TransformVector(forward);
 			}
-			
-#pragma endregion
 		}
 	};
 }

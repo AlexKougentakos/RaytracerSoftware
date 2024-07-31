@@ -2,6 +2,9 @@
 
 #include <cstdint>
 
+#include "Camera.h"
+#include "Material.h"
+
 struct SDL_Window;
 struct SDL_Surface;
 
@@ -30,6 +33,9 @@ namespace dae
 
 		SDL_Surface* m_pBuffer{};
 		uint32_t* m_pBufferPixels{};
+
+		void RenderPixel(Scene* pScene, const Camera& camera, const std::vector<Material*>& materials,
+			const std::vector<Light>& lights, const float& FOV, unsigned int pixelIndex) const;
 
 		enum class LightingMode
 		{
