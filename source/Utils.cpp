@@ -82,42 +82,42 @@ namespace dae
 
         bool DidHit_MollerTrombore(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Ray& ray, unsigned char materialIndex, const Vector3& transformedNormal, HitRecord& hitRecord)
         {
-	        Vector3 edge1{}, edge2{}, h{}, s{}, q{};
-	        float a{}, f{}, u{}, v{};
-	        hitRecord.didHit = false;
+            const Vector3 edge1 = v1 - v0;
+            const Vector3 edge2 = v2 - v0;
+            const Vector3 h = Vector3::Cross(ray.direction, edge2);
+            const float a = Vector3::Dot(edge1, h);
 
-	        edge1 = { v1 - v0 };
-	        edge2 = { v2 - v0 };
+            // If a is too close to 0, ray is parallel to triangle.
+            if (abs(a) < 1e-6f)
+                return false;
 
-	        h = Vector3::Cross(ray.direction, edge2);
-	        a = Vector3::Dot(edge1, h);
+            const float f = 1.0f / a;
+            const Vector3 s = ray.origin - v0;
+            const float u = f * Vector3::Dot(s, h);
 
-	        if (AreEqual(a, 0))
-		        return false;
+            if (u < 0.0f || u > 1.0f)
+                return false;
 
-	        f = 1.f / a;
-	        s = ray.origin - v0;
-	        u = f * Vector3::Dot(s, h);
-	        if (u < 0.0f || u > 1.0f)
-		        return false;
-	        q = Vector3::Cross(s, edge1);
-	        v = f * Vector3::Dot(ray.direction, q);
-	        if (v < 0.0f || u + v > 1.0f)
-		        return false;
+            const Vector3 q = Vector3::Cross(s, edge1);
+            const float v = f * Vector3::Dot(ray.direction, q);
 
-	        float t{ f * Vector3::Dot(edge2, q) };
-	        if (t > 0.f)
-	        {
-		        hitRecord.origin = ray.origin + ray.direction * t;
-		        hitRecord.t = t;
-		        hitRecord.didHit = true;
-		        hitRecord.materialIndex = materialIndex;
-		        hitRecord.normal = transformedNormal;
-	        }
+            if (v < 0.0f || u + v > 1.0f)
+                return false;
 
-	        return hitRecord.didHit;
+            const float t = f * Vector3::Dot(edge2, q);
+
+            if (t > ray.min && t < ray.max)
+            {
+                hitRecord.t = t;
+                hitRecord.origin = ray.origin + ray.direction * t;
+                hitRecord.normal = transformedNormal;
+                hitRecord.materialIndex = materialIndex;
+                hitRecord.didHit = true;
+                return true;
+            }
+
+            return false;
         }
-
         bool DidHit(const Triangle& triangle, const Ray& ray, HitRecord& hitRecord)
         {
 	        const Vector3 a{ triangle.v1 - triangle.v0 };
@@ -201,30 +201,34 @@ namespace dae
             if (!HitTest_SlabTest(mesh, ray))
                 return false;
 
-            HitRecord hit{};
-            hitRecord.t = FLT_MAX;
-            for (int i{ 0 }; i < (mesh.indices.size() / 3); ++i)
-            {
-                Triangle temp{};
-                temp = { mesh.transformedPositions[mesh.indices[i * 3]], mesh.transformedPositions[mesh.indices[i * 3 + 1]], mesh.transformedPositions[mesh.indices[i * 3 + 2]] };
-                temp.cullMode = mesh.cullMode;
-                temp.materialIndex = mesh.materialIndex;
-                temp.normal = mesh.transformedNormals[i];
+            float closestT = FLT_MAX;
+            bool didHit = false;
+            HitRecord tempHit;
 
-                const bool didHitTriangle{ HitTest_Triangle(
-                    mesh.transformedPositions[mesh.indices[i * 3]], 
-                    mesh.transformedPositions[mesh.indices[i * 3 + 1]], 
+            const size_t triangleCount = mesh.indices.size() / 3;
+            for (size_t i = 0; i < triangleCount; ++i)
+            {
+                if (HitTest_Triangle(
+                    mesh.transformedPositions[mesh.indices[i * 3]],
+                    mesh.transformedPositions[mesh.indices[i * 3 + 1]],
                     mesh.transformedPositions[mesh.indices[i * 3 + 2]],
                     mesh.cullMode,
                     mesh.materialIndex,
                     mesh.transformedNormals[i],
-                    ray, hit, ignoreHitRecord) };
-
-                if (didHitTriangle)
-                    if (hit.t < hitRecord.t) hitRecord = hit;
+                    ray,
+                    tempHit,
+                    ignoreHitRecord))
+                {
+                    if (tempHit.t < closestT)
+                    {
+                        closestT = tempHit.t;
+                        hitRecord = tempHit;
+                        didHit = true;
+                    }
+                }
             }
 
-            return hitRecord.didHit;
+            return didHit;
         }
 
         bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray)
